@@ -302,6 +302,7 @@
         // --- Main Handler for User Input ---
         async function handleUserInput() {
             const userInput = chatInput.value.trim();
+            const backendUrl = 'https://germaiq.onrender.com/'
             if (!userInput) return;
 
             playPopSound(); // Play sound on send
@@ -312,7 +313,7 @@
             try {
                 let response;
                 if (currentMode === 'translate') {
-                    response = await fetch('/translate', {
+                    response = await fetch('${backendUrl}/translate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ text: userInput })
@@ -322,7 +323,7 @@
                     if (data.error) throw new Error(data.error);
                     addBotMessage(data.translation, 'bot', 'translator');
                 } else {
-                    response = await fetch('/tutor', {
+                    response = await fetch('${backendUrl}/tutor', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ question: userInput })
