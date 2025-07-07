@@ -1,33 +1,50 @@
-# backend.py
-# Our "middleman" server to securely call the APIs
+# backend.py with extra debugging prints
 
-# MODIFIED: Imported send_from_directory
 from flask import Flask, request, jsonify, send_from_directory
 import requests
 import os
 
-# Read API keys from environment variables for security
+app = Flask(__name__)
+
+# --- Load API Keys and Add Debug Prints ---
+print("Server is starting up...")
 DEEPL_API_KEY = os.environ.get('DEEPL_API_KEY')
 GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
-# -----------------------------------------
 
-app = Flask(__name__)
+# Print a confirmation to the logs to verify keys are loaded
+if DEEPL_API_KEY:
+    print(f"DeepL API Key loaded successfully. Starts with: {DEEPL_API_KEY[:4]}...")
+else:
+    print("!!! WARNING: DeepL API Key was NOT found in environment variables.")
+
+if GOOGLE_API_KEY:
+    print(f"Google AI API Key loaded successfully. Starts with: {GOOGLE_API_KEY[:4]}...")
+else:
+    print("!!! WARNING: Google AI API Key was NOT found in environment variables.")
 
 # --- API URLs ---
 DEEPL_API_URL = "https://api-free.deepl.com/v2/translate"
-GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
+# The Google API URL is now constructed inside the function to ensure the key is loaded
+# GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
 
-# --- NEW: Route to serve the HTML frontend ---
+# --- Route to serve the HTML frontend ---
 @app.route('/')
 def serve_index():
-    # This tells Flask to send the 'index.html' file from the current directory
+    print("Request received for the '/' route. Serving index.html.")
     return send_from_directory('.', 'index.html')
 
-# This endpoint will handle translation requests
+# --- Translation Endpoint with Debugging ---
 @app.route('/translate', methods=['POST'])
 def handle_translate():
+    print("\n--- Received request for /translate ---")
+    
+    if not DEEPL_API_KEY:
+        print("ERROR: Cannot process /translate because DeepL API Key is missing.")
+        return jsonify({'error': 'Server configuration error: DeepL API key is not set.'}), 500
+
     data = request.json
     text_to_translate = data.get('text')
+    print(f"Text to translate: '{text_to_translate}'")
 
     if not text_to_translate:
         return jsonify({'error': 'No text provided'}), 400
@@ -39,22 +56,31 @@ def handle_translate():
     }
     
     try:
+        print("Sending request to DeepL API...")
         response = requests.post(DEEPL_API_URL, data=params)
-        response.raise_for_status() # Raise an exception for bad status codes
+        response.raise_for_status() 
         result = response.json()
         translated_text = result['translations'][0]['text']
+        print("Successfully received translation from DeepL.")
         return jsonify({'translation': translated_text})
-    except requests.exceptions.HTTPError as http_err:
-        return jsonify({'error': str(http_err)}), http_err.response.status_code
     except Exception as e:
+        # This will print the exact error to the Render logs
+        print(f"!!! AN ERROR OCCURRED IN /translate: {e}")
         return jsonify({'error': str(e)}), 500
 
 
-# This endpoint will handle tutor questions
+# --- Tutor Endpoint with Debugging ---
 @app.route('/tutor', methods=['POST'])
 def handle_tutor():
+    print("\n--- Received request for /tutor ---")
+
+    if not GOOGLE_API_KEY:
+        print("ERROR: Cannot process /tutor because Google API Key is missing.")
+        return jsonify({'error': 'Server configuration error: Google API key is not set.'}), 500
+
     data = request.json
     question = data.get('question')
+    print(f"Question for tutor: '{question}'")
 
     if not question:
         return jsonify({'error': 'No question provided'}), 400
@@ -66,29 +92,24 @@ def handle_tutor():
     Explain concepts clearly, concisely, and provide simple examples in both German (with article) and English.
     Keep your explanations focused and easy for a B1 learner to understand. Format your response nicely using markdown-style bolding for key terms.
     """
-    
     full_prompt = f"{system_prompt}\n\nStudent's Question: {question}"
-
-    payload = {
-        "contents": [{
-            "parts": [{"text": full_prompt}]
-        }]
-    }
+    payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
+    gemini_url_with_key = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
     
     try:
-        response = requests.post(GEMINI_API_URL, json=payload)
+        print("Sending request to Google AI API...")
+        response = requests.post(gemini_url_with_key, json=payload)
         response.raise_for_status()
         result = response.json()
         explanation = result['candidates'][0]['content']['parts'][0]['text']
+        print("Successfully received explanation from Google AI.")
         return jsonify({'explanation': explanation})
-    except requests.exceptions.HTTPError as http_err:
-        return jsonify({'error': str(http_err)}), http_err.response.status_code
     except Exception as e:
+        # This will print the exact error to the Render logs
+        print(f"!!! AN ERROR OCCURRED IN /tutor: {e}")
         return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
-    # MODIFIED: Updated the instruction message
     print("Starting Flask server... Go to http://127.0.0.1:5000 in your browser.")
     app.run(port=5000, debug=True)
-
