@@ -1,25 +1,24 @@
-# backend.py - Final Version with CORS Fix
+# backend.py - Final Version with Explicit CORS
 from flask import Flask, request, jsonify, send_from_directory
-# --- NEW: Import the CORS library ---
-from flask_cors import CORS
+from flask_cors import CORS # Import CORS
 import requests
 import os
+
+# --- Initialize Flask App ---
+app = Flask(__name__, static_folder='static')
+
+# --- Enable CORS ---
+# This is the crucial fix. It explicitly allows your Vercel frontend
+# to make requests to these specific API routes.
+CORS(app, resources={r"/translate": {}, r"/tutor": {}})
+
 
 # --- Load API Keys from Environment Variables ---
 DEEPL_API_KEY = os.environ.get('f449f8fb-0d21-4344-a73c-4e48789278d8:fx')
 GOOGLE_API_KEY = os.environ.get('AIzaSyDEQa-ezFv7OPrsQNtB5pIASBEw0h04e_k')
 
-app = Flask(__name__, static_folder='static')
-
-# --- NEW: Enable CORS for all routes ---
-# This tells the server to accept requests from any website.
-CORS(app)
-
-
-# --- API URLs ---
+# --- API URL ---
 DEEPL_API_URL = "https://api-free.deepl.com/v2/translate"
-# The Google API URL is now constructed inside the function to be safe
-# GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
 
 # --- Route to serve the main HTML file ---
 @app.route('/')
