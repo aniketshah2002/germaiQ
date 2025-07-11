@@ -1,18 +1,25 @@
-# backend.py - Final Version
+# backend.py - Final Version with CORS Fix
 from flask import Flask, request, jsonify, send_from_directory
+# --- NEW: Import the CORS library ---
+from flask_cors import CORS
 import requests
 import os
 
 # --- Load API Keys from Environment Variables ---
-# This is the secure way to handle keys. We will set these in the cloud.
 DEEPL_API_KEY = os.environ.get('f449f8fb-0d21-4344-a73c-4e48789278d8:fx')
 GOOGLE_API_KEY = os.environ.get('AIzaSyDEQa-ezFv7OPrsQNtB5pIASBEw0h04e_k')
 
 app = Flask(__name__, static_folder='static')
 
+# --- NEW: Enable CORS for all routes ---
+# This tells the server to accept requests from any website.
+CORS(app)
+
+
 # --- API URLs ---
 DEEPL_API_URL = "https://api-free.deepl.com/v2/translate"
-GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
+# The Google API URL is now constructed inside the function to be safe
+# GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
 
 # --- Route to serve the main HTML file ---
 @app.route('/')
@@ -53,9 +60,10 @@ def handle_tutor():
     system_prompt = "You are a friendly and helpful German language tutor for a B1 level student. Explain concepts clearly, concisely, and provide simple examples in both German and English. Format your response nicely using markdown-style bolding for key terms."
     full_prompt = f"{system_prompt}\n\nStudent's Question: {question}"
     payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
+    gemini_url_with_key = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
     
     try:
-        response = requests.post(GEMINI_API_URL, json=payload)
+        response = requests.post(gemini_url_with_key, json=payload)
         response.raise_for_status()
         result = response.json()
         return jsonify({'explanation': result['candidates'][0]['content']['parts'][0]['text']})
