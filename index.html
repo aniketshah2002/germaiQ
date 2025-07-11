@@ -1,22 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>German Language Tutor</title>
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* MODIFIED: New Dark Theme Styles */
         body {
             font-family: 'Poppins', sans-serif;
             position: relative;
             color: #fff;
-            /* New dark gradient with red and yellow tones */
             background: linear-gradient(135deg, #2d3748 0%, #c53030 100%);
         }
 
@@ -29,13 +24,21 @@
             height: 100%;
             background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre-v2.png');
             opacity: 0.05;
-            z-index: -1; 
+            z-index: -1;
         }
 
         @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         #background-overlay {
@@ -46,136 +49,90 @@
             height: 100%;
             opacity: 0;
             transition: opacity 2s ease-in-out;
-            z-index: -2; 
+            z-index: -2;
         }
 
         #chat-window::-webkit-scrollbar {
             width: 6px;
         }
+
         #chat-window::-webkit-scrollbar-track {
             background: #4a5568;
         }
+
         #chat-window::-webkit-scrollbar-thumb {
             background: #a0aec0;
             border-radius: 6px;
         }
+
         #chat-window::-webkit-scrollbar-thumb:hover {
             background: #cbd5e0;
         }
 
         .glass-container {
-            /* Dark glassmorphism */
             background: rgba(45, 55, 72, 0.4);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .internal-bg {
-            /* Darker internal background */
             background-color: rgba(26, 32, 44, 0.6);
         }
     </style>
 </head>
+
 <body class="flex items-center justify-center min-h-screen p-4">
-
     <div id="background-overlay"></div>
-
     <div class="glass-container w-full max-w-2xl h-[90vh] max-h-[700px] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-
-        <!-- Landing Page View -->
         <div id="landing-view" class="flex flex-col items-center justify-center h-full p-8 text-center">
             <img src="/static/images/logo.png" alt="Logo" class="w-24 h-24 mb-4 rounded-full shadow-lg border-2 border-white/50">
             <h1 class="text-4xl font-bold text-white mb-2">German Language Assistant</h1>
             <p class="text-gray-300 mb-8">Your personal AI-powered tool for learning German.</p>
             <div class="space-y-4 w-full max-w-sm">
-                <!-- MODIFIED: Button colors updated to turmeric yellow -->
-                <button id="start-translate-btn" class="w-full bg-yellow-500 text-gray-900 font-semibold py-4 px-6 rounded-xl text-lg hover:bg-yellow-600 transition-transform transform hover:scale-105 shadow-lg">
-                    Translate Text
-                </button>
-                <button id="start-tutor-btn" class="w-full bg-yellow-500 text-gray-900 font-semibold py-4 px-6 rounded-xl text-lg hover:bg-yellow-600 transition-transform transform hover:scale-105 shadow-lg">
-                    Ask a Tutor
-                </button>
+                <button id="start-translate-btn" class="w-full bg-yellow-500 text-gray-900 font-semibold py-4 px-6 rounded-xl text-lg hover:bg-yellow-600 transition-transform transform hover:scale-105 shadow-lg">Translate
+                    Text</button>
+                <button id="start-tutor-btn" class="w-full bg-yellow-500 text-gray-900 font-semibold py-4 px-6 rounded-xl text-lg hover:bg-yellow-600 transition-transform transform hover:scale-105 shadow-lg">Ask
+                    a Tutor</button>
             </div>
         </div>
-
-        <!-- Chat View -->
         <div id="chat-view" class="hidden flex-col h-full">
             <div class="flex items-center p-4 internal-bg border-b border-white/10 shadow-sm">
-                <button id="back-btn" class="p-2 rounded-full hover:bg-white/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button id="back-btn" class="p-2 rounded-full hover:bg-white/20"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    </button>
-                    <div class="ml-4 flex-1">
-                        <h2 id="chat-title" class="text-xl font-bold text-white">Chat</h2>
-                        <p id="chat-subtitle" class="text-sm text-gray-400">Mode</p>
-                    </div>
-                     <div id="mode-icon-container" class="w-10 h-10">
-                        <!-- The icon will be inserted here by JavaScript -->
-                        </div>
-                <div class="ml-4">
+                    </svg></button>
+                <div class="ml-4 flex-1">
                     <h2 id="chat-title" class="text-xl font-bold text-white">Chat</h2>
                     <p id="chat-subtitle" class="text-sm text-gray-400">Mode</p>
                 </div>
+                <div id="mode-icon-container" class="w-10 h-10"></div>
             </div>
-
-            <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6">
-            </div>
-
+            <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6"></div>
             <div class="p-4 internal-bg border-t border-white/10">
                 <form id="chat-form" class="flex items-center space-x-3">
                     <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 w-full px-4 py-3 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 transition bg-gray-700 text-white placeholder-gray-400">
-                    <!-- MODIFIED: Send button color updated -->
-                    <button type="submit" class="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition shadow">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <button type="submit" class="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition shadow"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
-                        </svg>
-                    </button>
+                        </svg></button>
                 </form>
             </div>
         </div>
     </div>
-
     <script>
-        // --- NEW: Sound Effect Logic ---
-        let audioContext;
-        // Function to create a pop sound
-        function playPopSound() {
-            if (!audioContext) {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                } catch (e) {
-                    console.error("Web Audio API is not supported in this browser");
-                    return;
-                }
-            }
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
-            
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
-            
-            oscillator.start(audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.05);
-            oscillator.stop(audioContext.currentTime + 0.05);
-        }
+        // THIS WILL BE UPDATED AFTER WE DEPLOY THE BACKEND
+        const backendUrl = '';
 
-        // --- NEW: SVG Icons ---
-        // --- NEW: SVG Icons ---
+        let audioContext;
+
+        function playPopSound() { /* ... sound logic ... */ }
         const icons = {
             tutor: `<svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>`,
             translator: `<svg class="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h1a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.758 16.242a3.375 3.375 0 01-3.375-3.375V9.375a3.375 3.375 0 013.375-3.375h8.485a3.375 3.375 0 013.375 3.375v3.5c0 .533.106 1.05.304 1.522a3.375 3.375 0 01-.608 3.635l-1.42 1.42a3.375 3.375 0 01-4.773 0l-.863-.863a3.375 3.375 0 00-4.773 0l-.54.54z"></path></svg>`
         };
-
-        // --- DYNAMIC BACKGROUND LOGIC ---
         const gradients = [
-            ['#2d3748', '#c53030'], ['#4a5568', '#f56565'], ['#1a202c', '#e53e3e']
+            ['#2d3748', '#c53030'],
+            ['#4a5568', '#f56565'],
+            ['#1a202c', '#e53e3e']
         ];
         let currentGradientIndex = 0;
         const backgroundOverlay = document.getElementById('background-overlay');
@@ -199,42 +156,40 @@
         }
         applyGradient(document.body, gradients[0]);
         setInterval(changeBackground, 10000);
+        const landingView = document.getElementById('landing-view'),
+            chatView = document.getElementById('chat-view'),
+            startTranslateBtn = document.getElementById('start-translate-btn'),
+            startTutorBtn = document.getElementById('start-tutor-btn'),
+            backBtn = document.getElementById('back-btn'),
+            chatTitle = document.getElementById('chat-title'),
+            chatSubtitle = document.getElementById('chat-subtitle'),
+            chatWindow = document.getElementById('chat-window'),
+            chatForm = document.getElementById('chat-form'),
+            chatInput = document.getElementById('chat-input'),
+            modeIconContainer = document.getElementById('mode-icon-container');
+        let currentMode = null;
 
-        // --- DOM Elements ---
-        const landingView = document.getElementById('landing-view');
-        const chatView = document.getElementById('chat-view');
-        const startTranslateBtn = document.getElementById('start-translate-btn');
-        const startTutorBtn = document.getElementById('start-tutor-btn');
-        const backBtn = document.getElementById('back-btn');
-        const chatTitle = document.getElementById('chat-title');
-        const chatSubtitle = document.getElementById('chat-subtitle');
-        const chatWindow = document.getElementById('chat-window');
-        const chatForm = document.getElementById('chat-form');
-        const chatInput = document.getElementById('chat-input');
-        const modeIconContainer = document.getElementById('mode-icon-container');
-        
-        // --- App State & View Logic ---
-        let currentMode = null; 
         function showChatView(mode) {
-                currentMode = mode;
-                landingView.classList.add('hidden');
-                chatView.classList.remove('hidden');
-                chatView.classList.add('flex');
-                chatWindow.innerHTML = '';
-                if (mode === 'translate') {
-                    chatTitle.textContent = 'English to German';
-                    chatSubtitle.textContent = 'Translator Mode';
-                    chatInput.placeholder = 'Type English text to translate...';
-                    addBotMessage("Hallo! I am the AI Translator. Give me any English text.", 'system', 'translator');
-                    modeIconContainer.innerHTML = icons.translator; // ADD THIS LINE
-                } else {
-                    chatTitle.textContent = 'German Language Tutor';
-                    chatSubtitle.textContent = 'Tutor Mode';
-                    chatInput.placeholder = 'Ask a question about German...';
-                    addBotMessage("Hello! I am the Tutor. Ask me anything about German.", 'system', 'tutor');
-                    modeIconContainer.innerHTML = icons.tutor; // ADD THIS LINE
-                }
+            currentMode = mode;
+            landingView.classList.add('hidden');
+            chatView.classList.remove('hidden');
+            chatView.classList.add('flex');
+            chatWindow.innerHTML = '';
+            if (mode === 'translate') {
+                chatTitle.textContent = 'English to German';
+                chatSubtitle.textContent = 'Translator Mode';
+                chatInput.placeholder = 'Type English text to translate...';
+                addBotMessage("Hallo! I am the AI Translator.", 'system', 'translator');
+                modeIconContainer.innerHTML = icons.translator;
+            } else {
+                chatTitle.textContent = 'German Language Tutor';
+                chatSubtitle.textContent = 'Tutor Mode';
+                chatInput.placeholder = 'Ask a question about German...';
+                addBotMessage("Hello! I am the Tutor.", 'system', 'tutor');
+                modeIconContainer.innerHTML = icons.tutor;
             }
+        }
+
         function showLandingView() {
             currentMode = null;
             chatView.classList.add('hidden');
@@ -249,37 +204,27 @@
             handleUserInput();
         });
 
-        // --- Chat Message Functions ---
         function scrollToBottom() {
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
+
         function addUserMessage(text) {
             const messageHtml = `<div class="flex justify-end"><div class="bg-red-600 text-white p-3 rounded-l-xl rounded-br-xl max-w-md shadow-lg"><p>${text}</p></div></div>`;
             chatWindow.insertAdjacentHTML('beforeend', messageHtml);
             scrollToBottom();
         }
 
-        // MODIFIED: Now accepts an iconType
         function addBotMessage(text, type = 'bot', iconType = null) {
             let bgColor = 'bg-gray-700/80 text-gray-200';
-            if (type === 'system') { bgColor = 'bg-yellow-500/20 text-yellow-200'; }
-            if (type === 'error') { bgColor = 'bg-red-500/30 text-red-200'; }
-
+            if (type === 'system') {
+                bgColor = 'bg-yellow-500/20 text-yellow-200';
+            }
+            if (type === 'error') {
+                bgColor = 'bg-red-500/30 text-red-200';
+            }
             const iconHtml = iconType && icons[iconType] ? `<div class="mr-3 flex-shrink-0">${icons[iconType]}</div>` : '';
-
-            let formattedText = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-yellow-400">$1</strong>')
-                .replace(/^#+\s*(.*)/gm, '<strong class="text-yellow-400">$1</strong>')
-                .replace(/\n/g, '<br>');
-
-            const messageHtml = `
-                <div class="flex justify-start items-end">
-                    ${iconHtml}
-                    <div class="${bgColor} p-3 rounded-r-xl rounded-bl-xl max-w-md shadow-lg">
-                        <p>${formattedText}</p>
-                    </div>
-                </div>`;
-            
+            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-yellow-400">$1</strong>').replace(/^#+\s*(.*)/gm, '<strong class="text-yellow-400">$1</strong>').replace(/\n/g, '<br>');
+            const messageHtml = `<div class="flex justify-start items-end">${iconHtml}<div class="${bgColor} p-3 rounded-r-xl rounded-bl-xl max-w-md shadow-lg"><p>${formattedText}</p></div></div>`;
             const thinking = document.getElementById('thinking-bubble');
             if (thinking) thinking.remove();
             chatWindow.insertAdjacentHTML('beforeend', messageHtml);
@@ -287,52 +232,49 @@
         }
 
         function addThinkingMessage(iconType) {
-             const iconHtml = iconType && icons[iconType] ? `<div class="mr-3 flex-shrink-0">${icons[iconType]}</div>` : '';
-             const messageHtml = `
-                <div id="thinking-bubble" class="flex justify-start items-end">
-                    ${iconHtml}
-                    <div class="bg-gray-700/80 text-gray-200 p-3 rounded-r-xl rounded-bl-xl max-w-md shadow-lg">
-                        <p class="animate-pulse">Thinking...</p>
-                    </div>
-                </div>`;
+            const iconHtml = iconType && icons[iconType] ? `<div class="mr-3 flex-shrink-0">${icons[iconType]}</div>` : '';
+            const messageHtml = `<div id="thinking-bubble" class="flex justify-start items-end">${iconHtml}<div class="bg-gray-700/80 text-gray-200 p-3 rounded-r-xl rounded-bl-xl max-w-md shadow-lg"><p class="animate-pulse">Thinking...</p></div></div>`;
             chatWindow.insertAdjacentHTML('beforeend', messageHtml);
             scrollToBottom();
         }
-
-        // --- Main Handler for User Input ---
         async function handleUserInput() {
             const userInput = chatInput.value.trim();
-            const backendUrl = 'https://germaiq.onrender.com/'
             if (!userInput) return;
-
-            playPopSound(); // Play sound on send
+            if (audioContext) playPopSound();
             addUserMessage(userInput);
             chatInput.value = '';
             addThinkingMessage(currentMode);
-
+            if (!backendUrl) {
+                addBotMessage("Frontend error: The backend URL is not set.", 'error');
+                return;
+            }
             try {
                 let response;
                 if (currentMode === 'translate') {
-                    response = await fetch('${backendUrl}/translate', {
+                    response = await fetch(`${backendUrl}/translate`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: userInput })
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text: userInput
+                        })
                     });
-                    if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
-                    const data = await response.json();
-                    if (data.error) throw new Error(data.error);
-                    addBotMessage(data.translation, 'bot', 'translator');
                 } else {
-                    response = await fetch('${backendUrl}/tutor', {
+                    response = await fetch(`${backendUrl}/tutor`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ question: userInput })
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            question: userInput
+                        })
                     });
-                    if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
-                    const data = await response.json();
-                    if (data.error) throw new Error(data.error);
-                    addBotMessage(data.explanation, 'bot', 'tutor');
                 }
+                if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                addBotMessage(data.translation || data.explanation, 'bot', currentMode);
             } catch (error) {
                 console.error("Frontend Error:", error);
                 addBotMessage(`Sorry, something went wrong. Check the backend server console for details. Error: ${error.message}`, 'error');
@@ -340,4 +282,5 @@
         }
     </script>
 </body>
+
 </html>
