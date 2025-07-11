@@ -1,19 +1,16 @@
-# backend.py - Final Version with Explicit CORS
+# backend.py - Final Version
 from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS # Import CORS
+from flask_cors import CORS
 import requests
 import os
 
 # --- Initialize Flask App ---
 app = Flask(__name__, static_folder='static')
-
-# --- Enable CORS ---
-# This is the crucial fix. It explicitly allows your Vercel frontend
-# to make requests to these specific API routes.
-CORS(app, resources={r"/translate": {}, r"/tutor": {}})
-
+# This allows cross-origin requests, which is good practice.
+CORS(app)
 
 # --- Load API Keys from Environment Variables ---
+# This is the secure way to handle keys. We will set these in the cloud.
 DEEPL_API_KEY = os.environ.get('f449f8fb-0d21-4344-a73c-4e48789278d8:fx')
 GOOGLE_API_KEY = os.environ.get('AIzaSyDEQa-ezFv7OPrsQNtB5pIASBEw0h04e_k')
 
@@ -25,7 +22,7 @@ DEEPL_API_URL = "https://api-free.deepl.com/v2/translate"
 def serve_index():
     return send_from_directory('.', 'index.html')
 
-# --- Route to serve static files (like images) ---
+# --- Route to serve static files (like your logo) ---
 @app.route('/static/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
